@@ -13,6 +13,7 @@ import {
   CalendarCheck,
   ScrollText,
   GraduationCap,
+  BarChart3,
   Settings,
   LogOut,
 } from "lucide-react";
@@ -22,6 +23,7 @@ const navItems = [
   { href: "/dashboard/learning/courses", label: "课程", icon: BookOpen },
   { href: "/dashboard/learning/logs", label: "学习日志", icon: NotebookPen },
   { href: "/dashboard/projects", label: "项目经历", icon: FolderKanban },
+  { href: "/dashboard/skills", label: "技能管理", icon: BarChart3 },
   { href: "/dashboard/achievements/competitions", label: "比赛经历", icon: Trophy },
   { href: "/dashboard/achievements/certificates", label: "证书", icon: GraduationCap },
   { href: "/dashboard/notes", label: "技术笔记", icon: FileText },

@@ -9,16 +9,17 @@ import {
   FolderKanban,
   NotebookPen,
   CalendarCheck,
-  ScrollText,
+  FileText,
+  BarChart3,
 } from "lucide-react";
 
 const mobileNavItems = [
   { href: "/dashboard", label: "首页", icon: LayoutDashboard },
   { href: "/dashboard/learning/courses", label: "学习", icon: BookOpen },
   { href: "/dashboard/projects", label: "项目", icon: FolderKanban },
-  { href: "/dashboard/learning/logs", label: "日志", icon: NotebookPen },
+  { href: "/dashboard/skills", label: "技能", icon: BarChart3 },
+  { href: "/dashboard/notes", label: "笔记", icon: FileText },
   { href: "/dashboard/reports/weekly", label: "周报", icon: CalendarCheck },
-  { href: "/dashboard/reports/monthly", label: "月报", icon: ScrollText },
 ];
 
 export function MobileNav() {
