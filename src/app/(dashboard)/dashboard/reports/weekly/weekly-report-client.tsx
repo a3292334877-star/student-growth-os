@@ -24,16 +24,28 @@ export function WeeklyReportClient({ initialReports }: WeeklyReportClientProps) 
     setError("");
 
     try {
+      console.log("[WeeklyReport] Generating report...");
       const res = await fetch("/api/reports/weekly", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({}),
       });
 
+      console.log("[WeeklyReport] Response status:", res.status);
+
       if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.error || "生成失败");
+        let errMsg = "生成失败";
+        try {
+          const data = await res.json();
+          errMsg = data.error || errMsg;
+        } catch {
+          errMsg = `服务器错误 (${res.status})`;
+        }
+        throw new Error(errMsg);
       }
+
+      const data = await res.json();
+      console.log("[WeeklyReport] Generated successfully");
 
       router.refresh();
       // Re-fetch reports
@@ -41,6 +53,7 @@ export function WeeklyReportClient({ initialReports }: WeeklyReportClientProps) 
       const newReports = await refreshRes.json();
       setReports(newReports);
     } catch (err) {
+      console.error("[WeeklyReport] Error:", err);
       setError(err instanceof Error ? err.message : "生成失败，请稍后重试");
     } finally {
       setGenerating(false);

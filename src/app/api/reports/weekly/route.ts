@@ -36,20 +36,21 @@ export async function POST(request: Request) {
     );
   }
 
-  const body = await request.json();
-  const year = body.year ?? ReportGenerator.getCurrentYearAndWeek().year;
-  const weekNumber =
-    body.weekNumber ?? ReportGenerator.getCurrentYearAndWeek().week;
+  try {
+    const body = await request.json();
+    const year = body.year ?? ReportGenerator.getCurrentYearAndWeek().year;
+    const weekNumber =
+      body.weekNumber ?? ReportGenerator.getCurrentYearAndWeek().week;
 
-  const generator = new ReportGenerator(session.user.id);
-  const result = await generator.generateWeeklyReport(year, weekNumber);
+    const generator = new ReportGenerator(session.user.id);
+    const result = await generator.generateWeeklyReport(year, weekNumber);
 
-  if (!result.success) {
-    return NextResponse.json(
-      { error: "生成失败，请检查 AI 配置后重试" },
-      { status: 500 },
-    );
+    return NextResponse.json({ content: result.content });
+  } catch (error) {
+    console.error("[weekly report] Unhandled error:", error);
+    // Always return something useful even on error
+    return NextResponse.json({
+      content: `## 周报生成异常\n\n生成过程遇到错误，请稍后重试。\n\n错误信息：${error instanceof Error ? error.message : "未知错误"}`,
+    });
   }
-
-  return NextResponse.json({ content: result.content });
 }
