@@ -270,17 +270,25 @@ export class ReportGenerator {
     const prompt = buildWeeklyReportPrompt(data);
 
     try {
-      const result = await ai.generate(
-        WEEKLY_REPORT_SYSTEM_PROMPT,
-        prompt,
-        { temperature: 0.7 },
-      );
+      // Use AI if available, otherwise use template fallback
+      let content: string;
+
+      if (ai.isAvailable()) {
+        const result = await ai.generate(
+          WEEKLY_REPORT_SYSTEM_PROMPT,
+          prompt,
+          { temperature: 0.7 },
+        );
+        content = result.content;
+      } else {
+        content = this.generateFallbackWeekly(data);
+      }
 
       if (existing) {
         await db
           .update(weeklyReports)
           .set({
-            aiContent: result.content,
+            aiContent: content,
             rawData: data as unknown as Record<string, unknown>,
             updatedAt: new Date(),
           })
@@ -290,19 +298,18 @@ export class ReportGenerator {
           userId: this.userId,
           year,
           weekNumber,
-          aiContent: result.content,
+          aiContent: content,
           rawData: data as unknown as Record<string, unknown>,
           status: "draft",
         });
       }
 
-      return { content: result.content, success: true };
+      return { content, success: true };
     } catch (error) {
       console.error("Generate weekly report error:", error);
-      return {
-        content: "周报生成失败，请稍后重试。",
-        success: false,
-      };
+      // Final fallback
+      const fallback = this.generateFallbackWeekly(data);
+      return { content: fallback, success: true };
     }
   }
 
@@ -331,17 +338,24 @@ export class ReportGenerator {
     const prompt = buildMonthlyReportPrompt(data);
 
     try {
-      const result = await ai.generate(
-        MONTHLY_REPORT_SYSTEM_PROMPT,
-        prompt,
-        { temperature: 0.7, maxTokens: 8192 },
-      );
+      let content: string;
+
+      if (ai.isAvailable()) {
+        const result = await ai.generate(
+          MONTHLY_REPORT_SYSTEM_PROMPT,
+          prompt,
+          { temperature: 0.7, maxTokens: 8192 },
+        );
+        content = result.content;
+      } else {
+        content = this.generateFallbackMonthly(data);
+      }
 
       if (existing) {
         await db
           .update(monthlyReports)
           .set({
-            aiContent: result.content,
+            aiContent: content,
             rawData: data as unknown as Record<string, unknown>,
             updatedAt: new Date(),
           })
@@ -351,20 +365,147 @@ export class ReportGenerator {
           userId: this.userId,
           year,
           month,
-          aiContent: result.content,
+          aiContent: content,
           rawData: data as unknown as Record<string, unknown>,
           status: "draft",
         });
       }
 
-      return { content: result.content, success: true };
+      return { content, success: true };
     } catch (error) {
       console.error("Generate monthly report error:", error);
-      return {
-        content: "月报生成失败，请稍后重试。",
-        success: false,
-      };
+      const fallback = this.generateFallbackMonthly(data);
+      return { content: fallback, success: true };
     }
+  }
+
+  /**
+   * Fallback template-based weekly report (no AI API key needed)
+   */
+  private generateFallbackWeekly(data: {
+    dateRange: string; totalStudyMinutes: number; studyDays: number; studyLogCount: number;
+    courses: string[]; projects: Array<{ name: string; status: string }>;
+    competitions: string[]; certificates: string[]; tags: string[]; hasData: boolean;
+  }): string {
+    const hours = Math.round(data.totalStudyMinutes / 60);
+    const minutes = data.totalStudyMinutes % 60;
+
+    let report = `## 本周概览\n\n`;
+    report += `**统计周期**: ${data.dateRange}\n\n`;
+
+    if (!data.hasData) {
+      report += `本周暂无学习记录。建议每天花10分钟记录学习内容，积累成长数据。\n\n`;
+      report += `## 下周计划\n\n`;
+      report += `- 设定每天的学习目标\n`;
+      report += `- 记录学习内容和时长\n`;
+      report += `- 开始一个小项目或实验\n`;
+      return report;
+    }
+
+    report += `### 学习情况\n\n`;
+    report += `- 总学习时长：${hours}小时${minutes}分钟\n`;
+    report += `- 学习天数：${data.studyDays}天\n`;
+    report += `- 日志条数：${data.studyLogCount}条\n`;
+    if (data.courses.length > 0) {
+      report += `- 涉及课程：${data.courses.join("、")}\n`;
+    }
+    if (data.tags.length > 0) {
+      report += `- 学习标签：${data.tags.join("、")}\n`;
+    }
+
+    if (data.projects.length > 0) {
+      report += `\n### 项目进展\n\n`;
+      for (const p of data.projects) {
+        const status = p.status === "completed" ? "✅ 已完成" : "🔄 进行中";
+        report += `- ${p.name} [${status}]\n`;
+      }
+    }
+
+    if (data.competitions.length > 0) {
+      report += `\n### 比赛与证书\n\n`;
+      report += `- 比赛：${data.competitions.join("、")}\n`;
+    }
+    if (data.certificates.length > 0) {
+      report += `- 证书：${data.certificates.join("、")}\n`;
+    }
+
+    if (hours >= 10) {
+      report += `\n### 本周亮点\n\n💪 本周学习时长超过10小时，保持了良好的学习节奏！\n`;
+    } else if (hours >= 5) {
+      report += `\n### 本周亮点\n\n👍 本周学习投入稳定，继续保持！\n`;
+    } else {
+      report += `\n### 待改进\n\n⏰ 本周学习时间较少，建议每天安排固定时间段学习。\n`;
+    }
+
+    report += `\n### 下周计划\n\n`;
+    report += `- 保持每天的学习习惯\n`;
+    report += `- 尝试将学到的知识应用到项目中\n`;
+    report += `- 定期回顾和总结\n`;
+
+    return report;
+  }
+
+  /**
+   * Fallback template-based monthly report (no AI API key needed)
+   */
+  private generateFallbackMonthly(data: {
+    monthLabel: string; totalStudyMinutes: number; studyDays: number; studyLogCount: number;
+    courses: string[]; completedProjects: string[]; competitions: string[]; certificates: string[];
+    tags: string[]; hasData: boolean;
+  }): string {
+    const hours = Math.round(data.totalStudyMinutes / 60);
+
+    let report = `## ${data.monthLabel}成长月报\n\n`;
+
+    if (!data.hasData) {
+      report += `本月暂无记录。\n\n`;
+      report += `### 下月目标\n\n`;
+      report += `1. 开始记录学习日志\n`;
+      report += `2. 设定月度学习目标\n`;
+      report += `3. 尝试参与一个项目或比赛\n`;
+      return report;
+    }
+
+    report += `### 月度概览\n\n`;
+    report += `- 总学习时长：${hours}小时\n`;
+    report += `- 学习天数：${data.studyDays}天\n`;
+    report += `- 日志条数：${data.studyLogCount}条\n`;
+
+    if (data.courses.length > 0) {
+      report += `- 涉及课程：${data.courses.length}门\n`;
+    }
+    if (data.tags.length > 0) {
+      report += `- 技能标签：${data.tags.join("、")}\n`;
+    }
+
+    if (data.completedProjects.length > 0) {
+      report += `\n### 成果产出\n\n`;
+      report += `项目完成：${data.completedProjects.join("、")}\n`;
+    }
+
+    if (data.competitions.length > 0 || data.certificates.length > 0) {
+      report += `\n### 荣誉记录\n\n`;
+      if (data.competitions.length > 0) report += `- 比赛：${data.competitions.join("、")}\n`;
+      if (data.certificates.length > 0) report += `- 证书：${data.certificates.join("、")}\n`;
+    }
+
+    const dailyAvg = data.studyDays > 0 ? Math.round(hours / data.studyDays * 10) / 10 : 0;
+    report += `\n### 成长分析\n\n`;
+    report += `日均学习 ${dailyAvg} 小时，`;
+    if (dailyAvg >= 3) {
+      report += `学习强度很高，继续保持！`;
+    } else if (dailyAvg >= 1) {
+      report += `学习状态良好，有提升空间。`;
+    } else {
+      report += `建议增加每天的学习时间。`;
+    }
+
+    report += `\n\n### 下月目标\n\n`;
+    report += `1. 持续积累学习记录\n`;
+    report += `2. 推进项目进展\n`;
+    report += `3. 关注技能提升方向\n`;
+
+    return report;
   }
 
   /**
