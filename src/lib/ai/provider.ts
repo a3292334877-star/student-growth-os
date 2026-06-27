@@ -11,7 +11,7 @@ interface AIProviderConfig {
   priority: number;
 }
 
-interface AIResponse {
+export interface AIResponse {
   content: string;
   model: string;
   provider: string;

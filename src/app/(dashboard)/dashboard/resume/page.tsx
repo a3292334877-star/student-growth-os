@@ -1,4 +1,4 @@
-import { auth } from "@/lib/auth";
+import { getRequiredUserId } from "@/lib/auth-helpers";
 import { db } from "@/db";
 import { resumes } from "@/db/schema/resumes";
 import { resumeEntries } from "@/db/schema/resume-entries";
@@ -10,8 +10,7 @@ import { eq, desc } from "drizzle-orm";
 import { ResumeList } from "./resume-list";
 
 export default async function ResumePage() {
-  const session = await auth();
-  const userId = session!.user!.id;
+  const userId = await getRequiredUserId();
 
   const [resumeList, projectList, competitionList, courseList, certList] =
     await Promise.all([

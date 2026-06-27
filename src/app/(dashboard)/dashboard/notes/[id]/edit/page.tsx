@@ -1,4 +1,4 @@
-import { auth } from "@/lib/auth";
+import { getRequiredUserId } from "@/lib/auth-helpers";
 import { db } from "@/db";
 import { notes } from "@/db/schema/notes";
 import { eq, and } from "drizzle-orm";
@@ -10,13 +10,13 @@ export default async function EditNotePage({
 }: {
   params: Promise<{ id: string }>;
 }) {
-  const session = await auth();
   const { id } = await params;
+  const userId = await getRequiredUserId();
 
   const note = await db
     .select()
     .from(notes)
-    .where(and(eq(notes.id, id), eq(notes.userId, session!.user!.id)))
+    .where(and(eq(notes.id, id), eq(notes.userId, userId)))
     .then((rows) => rows[0]);
 
   if (!note) {

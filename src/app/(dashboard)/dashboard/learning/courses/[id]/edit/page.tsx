@@ -1,4 +1,4 @@
-import { auth } from "@/lib/auth";
+import { getRequiredUserId } from "@/lib/auth-helpers";
 import { db } from "@/db";
 import { courses } from "@/db/schema/courses";
 import { eq, and } from "drizzle-orm";
@@ -10,13 +10,13 @@ export default async function EditCoursePage({
 }: {
   params: Promise<{ id: string }>;
 }) {
-  const session = await auth();
   const { id } = await params;
+  const userId = await getRequiredUserId();
 
   const course = await db
     .select()
     .from(courses)
-    .where(and(eq(courses.id, id), eq(courses.userId, session!.user!.id)))
+    .where(and(eq(courses.id, id), eq(courses.userId, userId)))
     .then((rows) => rows[0]);
 
   if (!course) {

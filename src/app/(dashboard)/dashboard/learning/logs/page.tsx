@@ -1,4 +1,4 @@
-import { auth } from "@/lib/auth";
+import { getRequiredUserId } from "@/lib/auth-helpers";
 import { db } from "@/db";
 import { studyLogs } from "@/db/schema/study-logs";
 import { eq } from "drizzle-orm";
@@ -8,8 +8,7 @@ import { Plus } from "lucide-react";
 import { StudyLogCalendar } from "./study-log-calendar";
 
 export default async function StudyLogsPage() {
-  const session = await auth();
-  const userId = session!.user!.id;
+  const userId = await getRequiredUserId();
 
   const logList = await db
     .select()

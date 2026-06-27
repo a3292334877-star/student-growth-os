@@ -1,4 +1,4 @@
-import { auth } from "@/lib/auth";
+import { getRequiredUserId } from "@/lib/auth-helpers";
 import { db } from "@/db";
 import { courses } from "@/db/schema/courses";
 import { eq } from "drizzle-orm";
@@ -8,8 +8,7 @@ import Link from "next/link";
 import { CourseList } from "./course-list";
 
 export default async function CoursesPage() {
-  const session = await auth();
-  const userId = session!.user!.id;
+  const userId = await getRequiredUserId();
 
   const courseList = await db
     .select()

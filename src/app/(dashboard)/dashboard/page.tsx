@@ -1,4 +1,5 @@
 import { auth } from "@/lib/auth";
+import { getRequiredUserId } from "@/lib/auth-helpers";
 import { db } from "@/db";
 import { courses } from "@/db/schema/courses";
 import { studyLogs } from "@/db/schema/study-logs";
@@ -15,7 +16,7 @@ import { Sparkles, ArrowRight } from "lucide-react";
 
 export default async function DashboardPage() {
   const session = await auth();
-  const userId = session!.user!.id;
+  const userId = await getRequiredUserId();
 
   const [
     courseList,

@@ -183,7 +183,7 @@ export function SkillManager({ initialSkills }: SkillManagerProps) {
                           <div
                             key={i}
                             className={`h-2 w-4 rounded-sm ${
-                              i < skill.proficiency
+                              i < (skill.proficiency ?? 0)
                                 ? "bg-primary-500"
                                 : "bg-gray-200"
                             }`}

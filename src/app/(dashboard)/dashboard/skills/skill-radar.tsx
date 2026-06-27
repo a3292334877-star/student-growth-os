@@ -14,7 +14,7 @@ export function SkillRadar({ skills }: SkillRadarProps) {
     for (const skill of skills) {
       const cat = skill.category || "其他";
       if (!categoryMap.has(cat)) categoryMap.set(cat, []);
-      categoryMap.get(cat)!.push(skill.proficiency);
+      categoryMap.get(cat)!.push(skill.proficiency ?? 0);
     }
 
     return Array.from(categoryMap.entries())

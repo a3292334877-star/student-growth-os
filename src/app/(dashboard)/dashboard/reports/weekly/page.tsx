@@ -1,4 +1,4 @@
-import { auth } from "@/lib/auth";
+import { getRequiredUserId } from "@/lib/auth-helpers";
 import { db } from "@/db";
 import { weeklyReports } from "@/db/schema/weekly-reports";
 import { eq, desc } from "drizzle-orm";
@@ -6,8 +6,7 @@ import { EmptyState } from "@/components/shared/empty-state";
 import { WeeklyReportClient } from "./weekly-report-client";
 
 export default async function WeeklyReportsPage() {
-  const session = await auth();
-  const userId = session!.user!.id;
+  const userId = await getRequiredUserId();
 
   const reports = await db
     .select()

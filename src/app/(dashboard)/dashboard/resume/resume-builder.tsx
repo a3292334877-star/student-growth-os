@@ -8,7 +8,7 @@ import type { Project } from "@/db/schema/projects";
 import type { Competition } from "@/db/schema/competitions";
 import type { Course } from "@/db/schema/courses";
 import type { Certificate } from "@/db/schema/certificates";
-import { ArrowLeft, Plus, Sparkles, Trash2, GripVertical, Loader2 } from "lucide-react";
+import { ArrowLeft, Plus, Sparkles, Trash2, ExternalLink, Loader2 } from "lucide-react";
 import { ResumePreview } from "./resume-preview";
 
 interface ResumeBuilderProps {
@@ -270,7 +270,7 @@ export function ResumeBuilder({
                       <div className="flex-1 space-y-2">
                         <input
                           type="text"
-                          value={entry.title}
+                          value={entry.title ?? ""}
                           onChange={(e) =>
                             handleEntryChange(entry.id, "title", e.target.value)
                           }

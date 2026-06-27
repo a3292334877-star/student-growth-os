@@ -1,4 +1,4 @@
-import { auth } from "@/lib/auth";
+import { getRequiredUserId } from "@/lib/auth-helpers";
 import { db } from "@/db";
 import { certificates } from "@/db/schema/certificates";
 import { eq } from "drizzle-orm";
@@ -8,8 +8,7 @@ import { Plus } from "lucide-react";
 import { CertificateList } from "./certificate-list";
 
 export default async function CertificatesPage() {
-  const session = await auth();
-  const userId = session!.user!.id;
+  const userId = await getRequiredUserId();
 
   const certList = await db
     .select()

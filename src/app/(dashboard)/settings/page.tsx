@@ -1,4 +1,4 @@
-import { auth } from "@/lib/auth";
+import { getRequiredUserId } from "@/lib/auth-helpers";
 import { db } from "@/db";
 import { users } from "@/db/schema/users";
 import { eq } from "drizzle-orm";
@@ -6,8 +6,7 @@ import { SettingsForm } from "./settings-form";
 import { ExportButton } from "@/components/dashboard/export-button";
 
 export default async function SettingsPage() {
-  const session = await auth();
-  const userId = session!.user!.id;
+  const userId = await getRequiredUserId();
 
   const user = await db
     .select()

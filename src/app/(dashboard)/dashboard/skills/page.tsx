@@ -1,4 +1,4 @@
-import { auth } from "@/lib/auth";
+import { getRequiredUserId } from "@/lib/auth-helpers";
 import { db } from "@/db";
 import { skillTags } from "@/db/schema/skill-tags";
 import { eq } from "drizzle-orm";
@@ -6,8 +6,7 @@ import { EmptyState } from "@/components/shared/empty-state";
 import { SkillManager } from "./skill-manager";
 
 export default async function SkillsPage() {
-  const session = await auth();
-  const userId = session!.user!.id;
+  const userId = await getRequiredUserId();
 
   const skills = await db
     .select()

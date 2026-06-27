@@ -14,13 +14,12 @@ export async function GET(request: Request) {
   const search = searchParams.get("search");
   const category = searchParams.get("category");
 
-  let query = db
+  const allNotes = await db
     .select()
     .from(notes)
     .where(eq(notes.userId, session.user.id))
     .orderBy(desc(notes.updatedAt));
 
-  const allNotes = await query;
   let filtered = allNotes;
 
   if (search) {

@@ -3,6 +3,7 @@ import { auth } from "@/lib/auth";
 import { db } from "@/db";
 import { courses } from "@/db/schema/courses";
 import { courseSchema } from "@/lib/validations/course";
+import { eq } from "drizzle-orm";
 
 export async function POST(request: Request) {
   const session = await auth();

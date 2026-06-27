@@ -1,4 +1,4 @@
-import { auth } from "@/lib/auth";
+import { getRequiredUserId } from "@/lib/auth-helpers";
 import { db } from "@/db";
 import { competitions } from "@/db/schema/competitions";
 import { eq } from "drizzle-orm";
@@ -8,8 +8,7 @@ import { Plus } from "lucide-react";
 import { CompetitionList } from "./competition-list";
 
 export default async function CompetitionsPage() {
-  const session = await auth();
-  const userId = session!.user!.id;
+  const userId = await getRequiredUserId();
 
   const competitionList = await db
     .select()

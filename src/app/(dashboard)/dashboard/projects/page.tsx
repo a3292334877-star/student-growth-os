@@ -1,4 +1,4 @@
-import { auth } from "@/lib/auth";
+import { getRequiredUserId } from "@/lib/auth-helpers";
 import { db } from "@/db";
 import { projects } from "@/db/schema/projects";
 import { eq } from "drizzle-orm";
@@ -8,8 +8,7 @@ import { Plus } from "lucide-react";
 import { ProjectList } from "./project-list";
 
 export default async function ProjectsPage() {
-  const session = await auth();
-  const userId = session!.user!.id;
+  const userId = await getRequiredUserId();
 
   const projectList = await db
     .select()

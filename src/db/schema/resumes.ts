@@ -11,7 +11,7 @@ export const resumes = pgTable("resumes", {
   userId: uuid("user_id")
     .notNull()
     .references(() => users.id, { onDelete: "cascade" }),
-  title: varchar("title", { length: 200 }).default("我的简历"),
+  title: varchar("title", { length: 200 }).default("我的简历").notNull(),
   templateId: varchar("template_id", { length: 50 }),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),

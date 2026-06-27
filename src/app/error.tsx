@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+
 export default function ErrorPage({
   error,
   reset,
@@ -24,12 +26,12 @@ export default function ErrorPage({
           >
             重试
           </button>
-          <a
+          <Link
             href="/"
             className="rounded-lg border border-gray-300 px-6 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50"
           >
             返回首页
-          </a>
+          </Link>
         </div>
         {process.env.NODE_ENV === "development" && (
           <pre className="mt-8 max-w-2xl overflow-auto rounded-lg bg-red-50 p-4 text-left text-xs text-red-600">

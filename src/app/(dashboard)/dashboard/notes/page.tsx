@@ -1,4 +1,4 @@
-import { auth } from "@/lib/auth";
+import { getRequiredUserId } from "@/lib/auth-helpers";
 import { db } from "@/db";
 import { notes } from "@/db/schema/notes";
 import { eq, desc } from "drizzle-orm";
@@ -8,8 +8,7 @@ import { Plus } from "lucide-react";
 import { NoteListClient } from "./note-list-client";
 
 export default async function NotesPage() {
-  const session = await auth();
-  const userId = session!.user!.id;
+  const userId = await getRequiredUserId();
 
   const noteList = await db
     .select()
@@ -18,7 +17,7 @@ export default async function NotesPage() {
     .orderBy(desc(notes.updatedAt));
 
   // Get unique categories
-  const categories = [...new Set(noteList.map((n) => n.category).filter(Boolean))];
+  const categories = [...new Set(noteList.map((n) => n.category).filter((c): c is string => c !== null && c !== undefined))];
 
   return (
     <div className="space-y-6">

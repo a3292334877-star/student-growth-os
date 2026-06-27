@@ -1,4 +1,4 @@
-import { auth } from "@/lib/auth";
+import { getRequiredUserId } from "@/lib/auth-helpers";
 import { db } from "@/db";
 import { monthlyReports } from "@/db/schema/monthly-reports";
 import { eq, desc } from "drizzle-orm";
@@ -6,8 +6,7 @@ import { EmptyState } from "@/components/shared/empty-state";
 import { MonthlyReportClient } from "./monthly-report-client";
 
 export default async function MonthlyReportsPage() {
-  const session = await auth();
-  const userId = session!.user!.id;
+  const userId = await getRequiredUserId();
 
   const reports = await db
     .select()
